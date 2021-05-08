@@ -1,6 +1,7 @@
 # Chimera: Learning Shared Semantic Space for Speech-to-Text Translation (Nightly Version)
 
-This is a Pytorch implementation for the [Chimera][Chimera] paper (ACL Findings 2021), which aims to bridge the modality gap by unifying the task of MT (textual Machine Translation) and ST (Speech-to-Text Translation).
+This is a Pytorch implementation for the [Chimera][Chimera] paper (accepted by ACL Findings 2021),
+which aims to bridge the modality gap by unifying the task of MT (textual Machine Translation) and ST (Speech-to-Text Translation).
 It has achieved new SOTA performance on all 8 language pairs in MuST-C benchmark, by utilizing an external MT corpus.
 
 This repository is up to now a nightly version,
@@ -15,11 +16,20 @@ and both the codes and checkpoints are not compatible with currect Fairseq versi
 You will need to modify the model codes for checkpoint configurations
 if you want to follow the new FairSeq codes.
 
-**CONTRIBUTION** You are also more than welcome to test our code on your machines,
+**CONTRIBUTION:** You are also more than welcomed to test our code on your machines,
 and report feedbacks on results, bugs and performance!
 
 
-## Trained Checkpoints
+# Results
+
+Our model (Chimera) achieves new state-of-the-art results on all 8 language pairs on MuST-C:
+
+| EN-DE | EN-FR | EN-RU | EN-ES | EN-IT | EN-RO | EN-PT | EN-NL |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| 26.3  | 35.6  | 17.4  | 30.6  | 25.0  | 24.0  | 30.2  | 29.2  |
+
+
+# Trained Checkpoints
 
 Our trained checkpoints are available at:
 
@@ -34,28 +44,17 @@ Our trained checkpoints are available at:
 | English-to-Portuguese | Chimera_EN2PT.pt | http://sf3-ttcdn-tos.pstatp.com/obj/nlp-opensource/acl2021/chimera/Chimera_EN2PT.pt |
 | English-to-Dutch      | Chimera_EN2NL.pt | http://sf3-ttcdn-tos.pstatp.com/obj/nlp-opensource/acl2021/chimera/Chimera_EN2NL.pt |
 
-## Trained Checkpoints
+
+# Interactive Translation
 
 You can download any one checkpoint mentioned above to local,
-and translate local audios to another language!
+and translate local audios (only .wav files supported) to another language!
 To do this, you only need to run the model in an interactive mode.
 For example, you want to translate from English to Deutsh (DE):
 ```
 bash run.sh --script chimera/scripts/interactive-en2any-ST.sh \
-    --tareget de
+    --target de
 ```
-
-Other language codes other than English are (usually used in lower case):
-| Language | Code |
-| -------- | ---- |
-| Deutsch (German)      | DE / de |
-| French                | FR / fr |
-| Espanol (Spanish)     | ES / es |
-| Russian               | RU / ru |
-| Italiano (Italian)    | IT / it |
-| Romanian              | RO / ro |
-| Portuguese            | PT / pt |
-| Dutch (Netherlands)   | NL / nl |
 
 
 The program will prompt an input file name like this:
@@ -70,15 +69,32 @@ D-0     -1.0      Nach dem ...
 P-0     -1.0000 -1.0000 ...
 ```
 
+**NOTE:** Do not input a file too large.
+Normally the model can translate 1~5 normal-length sentences in one time.
+If the input sentence is too long, the program could crash.
+
 To exit the interactive mode, you only need to input an invalid file name.
 
+To translate to other languages, remember to replace `de` with their language codes
+(in lower case):
+| Language | Code |
+| -------- | ---- |
+| Deutsch (German)      | DE / de |
+| French                | FR / fr |
+| Espanol (Spanish)     | ES / es |
+| Russian               | RU / ru |
+| Italiano (Italian)    | IT / it |
+| Romanian              | RO / ro |
+| Portuguese            | PT / pt |
+| Dutch (Netherlands)   | NL / nl |
 
-## Training a Model on MuST-C
+
+# Training a Model on MuST-C
 
 Let's first take a look at training an English-to-Deutsch model as an example.
 
 
-### Data Preparation
+## Data Preparation
 
 0. For configuration, please set the global variables of
 `$WMT_ROOT`, `$MUSTC_ROOT` and `SAVE_ROOT`
@@ -128,7 +144,7 @@ This is okay in most cases,
 with the only risk being a potential mismatch to already trained checkpoints we provided.
 
 
-### Training
+## Training
 
 To reproduce the results in the last row in Figure 1 in paper,
 you can directly use the training scripts available as follows.
@@ -169,7 +185,7 @@ in which case, you can manually raise the suicide flag by
 to kill the background generation process.
 
 
-### Other Language Pairs
+## Other Language Pairs
 For language pairs English-to-{French, Russian, Espanol},
 you only need to replace the `export target=de` to {`fr`, `ru`, `es`} in step 0,
 and then run the steps 1~5.
@@ -178,10 +194,15 @@ For language pairs English-to-{Italiano, Portuguese, Dutch, Romanian},
 the MT data is different, so we need to modify Step 2. We will update this part later.
 
 
-### Evaluating a checkpoint
+## Evaluating a Checkpoint
 
 You can also manually evaluate the performance of any one checkpoint on MuST-C test set.
 Suppose the path to your checkpoint is `$CHECKPOINT`
 ```
 target=de bash chimera/generate/generate-mustc.sh $CHECKPOINT
 ```
+
+# License
+
+Part of codes (especially codes outside `chimera/`) is adapted from FAIRSEQ code base,
+therefore carrying the MIT License of its original codes.

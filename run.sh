@@ -3,7 +3,7 @@
 export version=a
 export seed=1
 export resume=False
-export num_gpus=8
+export num_gpus=$(python3 chimera/tools/count_gpus.py)
 export SCRIPTPATH=$(pwd)
 export target=de
 export dataset=wmt14

@@ -2,13 +2,9 @@
 
 # prerequisits and environment variables
 export MUSTC_ROOT="speech_data/mustc"
-export ST_SAVE_DIR="$SAVE_ROOT/st"
-export MT_SAVE_DIR="$SAVE_ROOT/mt"
-export SAVE_DIR=$ST_SAVE_DIR
 export WAVE2VEC_DIR="$SAVE_ROOT/wave2vec"
 pretrained_ckpt=wav2vec_small.pt
-mkdir -p $ST_SAVE_DIR $MT_SAVE_DIR $ASR_SAVE_DIR $WAVE2VEC_DIR $WMT_ROOT $MUSTC_ROOT $LS_ROOT
-reset_optimizer="--reset-optimizer"
+mkdir -p $WAVE2VEC_DIR $MUSTC_ROOT
 
 # downloading wav2vec2 ckpt
 bash chimera/tools/download_wav2vec2.sh $pretrained_ckpt $WAVE2VEC_DIR
