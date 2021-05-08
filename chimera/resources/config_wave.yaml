@@ -1,0 +1,13 @@
+audio_root: /opt/tiger/Chimera-SLT/speech_data/mustc
+bpe_tokenizer:
+  bpe: sentencepiece
+  sentencepiece_model: /opt/tiger/Chimera-SLT/speech_data/mustc/en-de/spm_unigram10000_wave_joint.model
+input_channels: 1
+input_feat_per_channel: 80
+sampling_alpha: 1.0
+src_bpe_tokenizer:
+  bpe: sentencepiece
+  sentencepiece_model: /opt/tiger/Chimera-SLT/speech_data/mustc/en-de/spm_unigram10000_wave_joint.model
+src_vocab_filename: spm_unigram10000_wave_joint.txt
+use_audio_input: true
+vocab_filename: spm_unigram10000_wave_joint.txt

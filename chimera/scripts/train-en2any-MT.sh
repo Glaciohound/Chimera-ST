@@ -7,10 +7,8 @@ export SAVE_DIR=$MT_SAVE_DIR
 export WAVE2VEC_DIR="$SAVE_ROOT/wave2vec"
 pretrained_ckpt=wav2vec_small.pt
 mkdir -p $ST_SAVE_DIR $MT_SAVE_DIR $WAVE2VEC_DIR $MUSTC_ROOT $WMT_ROOT
-target=de
-dataset=wmt14
 
-# loading wav2vec2 ckpt
+# downloading wav2vec2 ckpt
 bash chimera/tools/download_wav2vec2.sh $pretrained_ckpt $WAVE2VEC_DIR
 
 # WMT-MUSTC joint data and spm
@@ -26,12 +24,11 @@ fairseq-preprocess \
     --workers 100
 
 # Auto-evaluating
-python3 chimera/generate/auto-generate.py \
+CUDA_VISIBLE_DEVICES= python3 chimera/generate/auto-generate.py \
     --dirname ${SAVE_DIR} \
     --generate_script \
         chimera/generate/generate-wmt17-1-gpu.sh \
         chimera/generate/generate-wmt17-gpu.sh \
-    --haruna_logdir $chi_ckpt_dir \
     --eval_log_suffix mustc wmt \
     --silent &
 generate_pid=$!
@@ -59,7 +56,7 @@ fairseq-train $WMT_ROOT/bin \
     \
     --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 \
     --lr 5e-4 --lr-scheduler inverse_sqrt --weight-decay 0.0001 \
-    --max-update 500000 --warmup-updates 4000 \
+    --max-update $max_updates --warmup-updates 4000 \
     --fp16 \
     \
     --update-freq $(expr 8 / $num_gpus) --num-workers 1 \

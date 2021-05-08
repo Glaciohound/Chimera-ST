@@ -213,7 +213,7 @@ def process(args):
         if args.joint_spm is not None:
             spm_filename_prefix = \
                 f"spm_{args.vocab_type}{v_size_str}_{args.task}_joint"
-            os_system(f"cpr"
+            os_system(f"cp"
                       f" {chi_spm_dir}/{args.joint_spm}/{spm_filename_prefix}*"
                       f" {cur_root}")
         else:

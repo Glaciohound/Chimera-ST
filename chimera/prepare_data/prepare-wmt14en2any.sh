@@ -36,7 +36,7 @@ NORM_PUNC=$SCRIPTS/tokenizer/normalize-punctuation.perl
 REM_NON_PRINT_CHAR=$SCRIPTS/tokenizer/remove-non-printing-char.perl
 BPEROOT=subword-nmt/subword_nmt
 BPE_TOKENS=$subword_tokens
-CODE_ROOT=$(pwd)
+SCRIPTPATH=$(pwd)
 mkdir -p $DATA_ROOT
 cd $DATA_ROOT
 
@@ -101,7 +101,9 @@ fi
 echo "pre-processing train data..."
 for l in $src $tgt; do
     train_file=$tmp/train.tags.$lang.tok.$l
-    rm $train_file
+    if [[ -f $train_file ]]; then
+        rm $train_file
+    fi
     for f in "${CORPORA[@]}"; do
         if [[ $f != "null" ]]; then
             echo "containing: $orig/$f.$l"
@@ -116,7 +118,9 @@ done
 if [[ $devset == "original" ]]; then
     echo "pre-processing original newstest2013 data..."
     for l in $src $tgt; do
-        rm $tmp/valid.tags.$lang.tok.$l
+        if [[ -f $tmp/valid.tags.$lang.tok.$l ]]; then
+            rm $tmp/valid.tags.$lang.tok.$l
+        fi
         cat $orig/$dev.$l | \
             perl $NORM_PUNC $l | \
             perl $REM_NON_PRINT_CHAR | \
@@ -174,7 +178,9 @@ fi
 
 # learning BPE
 TRAIN=$tmp/train.${tgt}-en
-rm -f $TRAIN
+if [[ -f $TRAIN ]]; then
+    rm -f $TRAIN
+fi
 for l in $src $tgt; do
     cat $tmp/train.$l >> $TRAIN
 done
@@ -193,7 +199,7 @@ if [[ $subword == "bpe" ]]; then
 
     if [[ $external == 'mustc' ]]; then
         cd $SCRIPTPATH
-        bash $SCRIPTPATH/chi/experiments/prepare_data/apply-bpe-to-mustc.sh \
+        bash $SCRIPTPATH/chimera/prepare_data/apply-bpe-to-mustc.sh \
             --code-dir $DATA_ROOT/$OUTDIR --tokenizer $DATA_ROOT/$TOKENIZER \
             --test-set tst-COMMON --lang-pair $src $tgt
         cd $DATA_ROOT
@@ -213,22 +219,22 @@ elif [[ $subword == "spm" ]]; then
 
     # learning spm or copying an existing one
     resource_spm=chimera/resources/$version-$src-$tgt-spm
-    if [[ -d $CODE_ROOT/$resource_spm ]]; then
+    if [[ -d $SCRIPTPATH/$resource_spm ]]; then
         echo "Existing spm dictionary $resource_spm detected. Copying..."
-        cp $CODE_ROOT/$resource_spm/* $spm/
+        cp $SCRIPTPATH/$resource_spm/* $spm/
     else
         echo "No existing spm detected. Learning unigram spm on $TRAIN ..."
-        python3 $SCRIPTPATH/chi/experiments/prepare_data/learn_spm.py \
+        python3 $SCRIPTPATH/chimera/prepare_data/learn_spm.py \
             --input $prep/tmp/train.$target-en \
             --vocab-size 10000 \
             --model-prefix $BPE_CODE
     fi
 
-    # applying BPE
+    # applying SPM algorithm
     for L in $src $tgt; do
         for f in train.$L valid.$L test.$L; do
             echo "apply_spm.py to ${f}..."
-            python3 $SCRIPTPATH/chi/experiments/prepare_data/apply_spm.py \
+            python3 $SCRIPTPATH/chimera/prepare_data/apply_spm.py \
                 --input-file $tmp/$f --output-file $tmp/spm.$f \
                 --model $BPE_CODE.model
         done
@@ -240,7 +246,7 @@ elif [[ $subword == "spm" ]]; then
             infile="$tmp/mustc-$test_set.$lang"
             outfile="$prep/mustc-$test_set.$lang"
             echo "apply_spm.py to $infile, saving to $outfile..."
-            python3 $SCRIPTPATH/chi/experiments/prepare_data/apply_spm.py \
+            python3 $SCRIPTPATH/chimera/prepare_data/apply_spm.py \
                 --input-file $infile --output-file $outfile \
                 --model $BPE_CODE.model
         done

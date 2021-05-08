@@ -8,10 +8,11 @@ export WAVE2VEC_DIR="$SAVE_ROOT/wave2vec"
 pretrained_ckpt=wav2vec_small.pt
 mkdir -p $ST_SAVE_DIR $MT_SAVE_DIR $ASR_SAVE_DIR $WAVE2VEC_DIR $WMT_ROOT $MUSTC_ROOT $LS_ROOT
 reset_optimizer="--reset-optimizer"
-dataset="wmt14"
-target="de"
 
-# loading wav2vec2 ckpt
+# downloading wav2vec2 ckpt
+bash chimera/tools/download_wav2vec2.sh $pretrained_ckpt $WAVE2VEC_DIR
+
+# loading MT pre-trained ckpt
 if [[ $resume == "True" ]]; then
     reset_optimizer=""
 else
@@ -19,11 +20,10 @@ else
 fi
 
 # Auto-evaluating
-python3 chimera/generate/auto-generate.py \
+CUDA_VISIBLE_DEVICES= python3 chimera/generate/auto-generate.py \
     --dirname ${SAVE_DIR} \
     --generate_script \
         chimera/generate/generate-mustc.sh \
-    --haruna_logdir $chi_ckpt_dir \
     --silent &
 generate_pid=$!
 SUICIDE_CODE='chimera/tools/auto-generate-suicide.code'
@@ -46,7 +46,7 @@ fairseq-train ${MUSTC_ROOT}/en-$target \
     \
     --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 \
     --lr 1e-4 --lr-scheduler inverse_sqrt --weight-decay 0.0001 \
-    --max-update 150000 --warmup-updates 4000 \
+    --max-update $max_updates --warmup-updates 4000 \
     --fp16 \
     $reset_optimizer \
     \
