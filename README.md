@@ -1,6 +1,8 @@
 # Chimera: Learning Shared Semantic Space for Speech-to-Text Translation (Nightly Version)
 
-This is a Pytorch implementation for the [Chimera][Chimera] paper (accepted by ACL Findings 2021),
+This is a Pytorch implementation for the Chimera paper
+" Learning Shared Semantic Space for Speech-to-Text Translation "
+(accepted by ACL Findings 2021),
 which aims to bridge the modality gap by unifying the task of MT (textual Machine Translation) and ST (Speech-to-Text Translation).
 It has achieved new SOTA performance on all 8 language pairs in MuST-C benchmark, by utilizing an external MT corpus.
 
