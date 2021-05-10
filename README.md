@@ -1,7 +1,12 @@
 # Chimera: Learning Shared Semantic Space for Speech-to-Text Translation (Nightly Version)
 
+<div align="center">
+  <img src="chimera/resources/figs/logo.png" width="50%">
+</div>
+
 This is a Pytorch implementation for the Chimera paper
 " Learning Shared Semantic Space for Speech-to-Text Translation "
+https://arxiv.org/abs/2105.03095
 (accepted by ACL Findings 2021),
 which aims to bridge the modality gap by unifying the task of MT (textual Machine Translation) and ST (Speech-to-Text Translation).
 It has achieved new SOTA performance on all 8 language pairs in MuST-C benchmark, by utilizing an external MT corpus.
@@ -30,6 +35,15 @@ Our model (Chimera) achieves new state-of-the-art results on all 8 language pair
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
 | 26.3  | 35.6  | 17.4  | 30.6  | 25.0  | 24.0  | 30.2  | 29.2  |
 
+Shown below is a visualization of the "Memories" learned by Chimera.
+Each learned cluster represents a individual type of information,
+while each marker is a sentence sample.
+"+" and "." means text and audio samples, respectively.
+
+Click the image to view the dynamic video on YouTube.
+
+[![Memory Visualization](https://img.youtube.com/vi/qwIB-Kd514s/0.jpg)](https://www.youtube.com/watch?v=qwIB-Kd514s)
+
 
 # Trained Checkpoints
 
@@ -52,10 +66,11 @@ Our trained checkpoints are available at:
 You can download any one checkpoint mentioned above to local,
 and translate local audios (only .wav files supported) to another language!
 To do this, you only need to run the model in an interactive mode.
-For example, you want to translate from English to Deutsh (DE):
+For example, you want to translate from English to Deutsh (DE)
+with an already trained checkpoint at $CHECKPOINT:
 ```
 bash run.sh --script chimera/scripts/interactive-en2any-ST.sh \
-    --target de
+    --target de --checkpoint $CHECKPOINT
 ```
 
 
@@ -186,6 +201,20 @@ in which case, you can manually raise the suicide flag by
 `touch chimera/tools/auto-generate-suicide.code`
 to kill the background generation process.
 
+Note that this automatic process only evaluates a single checkpoint
+(with no averaging),
+and with a low beam width.
+
+6. Averaging Checkpoints and Evaluate It
+
+Suppose the best ST checkpoint is at epoch `$BEST_EPOCH`,
+and we want to averaging 7 checkpoints around it.
+```
+python3 chimera/tools/eval-average-checkpoint.py \
+    --ckpt-dir $ST_SAVE_ROOT --number-of-ckpts 7 \
+    --center-of-ckpts $BEST_EPOCH
+```
+
 
 ## Other Language Pairs
 For language pairs English-to-{French, Russian, Espanol},
@@ -201,7 +230,7 @@ the MT data is different, so we need to modify Step 2. We will update this part 
 You can also manually evaluate the performance of any one checkpoint on MuST-C test set.
 Suppose the path to your checkpoint is `$CHECKPOINT`
 ```
-target=de bash chimera/generate/generate-mustc.sh $CHECKPOINT
+target=de bash chimera/generate/generate-mustc-final.sh $CHECKPOINT
 ```
 
 # License

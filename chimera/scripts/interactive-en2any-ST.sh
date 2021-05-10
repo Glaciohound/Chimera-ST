@@ -10,7 +10,7 @@ mkdir -p $WAVE2VEC_DIR $MUSTC_ROOT
 bash chimera/tools/download_wav2vec2.sh $pretrained_ckpt $WAVE2VEC_DIR
 
 # making a fake config file
-python3 chimera/tools/hand-make-yaml.py \
+python3 chimera/tools/hand-make-config.py \
     --data-dir $MUSTC_ROOT/en-$target
 cp chimera/resources/$dataset-en-$target-spm/* $MUSTC_ROOT/en-$target
 
