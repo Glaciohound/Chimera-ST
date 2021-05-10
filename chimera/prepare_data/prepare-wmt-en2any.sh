@@ -64,6 +64,11 @@ elif [[ $target == "es" ]]; then
         "commoncrawl.es-en"
         "null"
     )
+elif [[ $target == "ro" ]]; then
+    CORPORA=(
+        "training-parallel-ep-v8/europarl-v8.ro-en"
+        "SETIMES/en-ro/setimes.en-ro"
+    )
 else
     echo "target language not supported"
     exit 1

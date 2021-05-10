@@ -4,7 +4,7 @@
   <img src="chimera/resources/figs/logo.png" width="50%">
 </div>
 
-This is a Pytorch implementation for the Chimera paper
+This is a Pytorch implementation for the "Chimera" paper
 " Learning Shared Semantic Space for Speech-to-Text Translation "
 https://arxiv.org/abs/2105.03095
 (accepted by ACL Findings 2021),
@@ -12,7 +12,8 @@ which aims to bridge the modality gap by unifying the task of MT (textual Machin
 It has achieved new SOTA performance on all 8 language pairs in MuST-C benchmark, by utilizing an external MT corpus.
 
 This repository is up to now a nightly version,
-and not fully tested on configurations other than the authors' working environment.
+and is bug-prone because of code refactoring.
+Also it is not fully tested on configurations other than the authors' working environment yet.
 However, we encourage you to first have a look at the results and model codes to get a general impression of what this project is about.
 
 The code base is forked from FairSeq repository
@@ -31,9 +32,9 @@ and report feedbacks on results, bugs and performance!
 
 Our model (Chimera) achieves new state-of-the-art results on all 8 language pairs on MuST-C:
 
-| EN-DE | EN-FR | EN-RU | EN-ES | EN-IT | EN-RO | EN-PT | EN-NL |
-| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| 26.3  | 35.6  | 17.4  | 30.6  | 25.0  | 24.0  | 30.2  | 29.2  |
+| Direction | EN-DE | EN-FR | EN-RU | EN-ES | EN-IT | EN-RO | EN-PT | EN-NL |
+| --------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| BLEU      | 26.3  | 35.6  | 17.4  | 30.6  | 25.0  | 24.0  | 30.2  | 29.2  |
 
 Shown below is a visualization of the "Memories" learned by Chimera.
 Each learned cluster represents a individual type of information,
@@ -113,7 +114,13 @@ Let's first take a look at training an English-to-Deutsch model as an example.
 
 ## Data Preparation
 
-0. For configuration, please set the global variables of
+0. Prerequisites and Configuration
+First check that requirements are met
+for `pip` in `requirements.txt` and for `apt` in `apt-requirements.txt`.
+Some items in the two files may be redundant,
+but we haven't got time to check and eliminate them.
+
+For configuration, please set the global variables of
 `$WMT_ROOT`, `$MUSTC_ROOT` and `SAVE_ROOT`
 These will be where to put the datasets and checkpoints.
 For example:
@@ -143,7 +150,7 @@ In this case you can turn to other faster download sources if possible.
 
 3. Append MuST-C text data to $WMT_ROOT, and prepare the datasets and produce a joint spm dictionary:
 ```
-bash chimera/prepare_data/prepare-wmt14en2any.sh \
+bash chimera/prepare_data/prepare-wmt-en2any.sh \
     --data-dir $WMT_ROOT --wmt14 --original-dev \
     --external mustc --target $target --subword spm
 python3 chimera/prepare_data/prep_mustc_data.py \
@@ -218,11 +225,46 @@ python3 chimera/tools/eval-average-checkpoint.py \
 
 ## Other Language Pairs
 For language pairs English-to-{French, Russian, Espanol},
-you only need to replace the `export target=de` to {`fr`, `ru`, `es`} in step 0,
+you only need to replace the `export target=de` with {`fr`, `ru`, `es`} in step 0,
 and then run the steps 1~5.
 
 For language pairs English-to-{Italiano, Portuguese, Dutch, Romanian},
-the MT data is different, so we need to modify Step 2. We will update this part later.
+the MT data is different, so we need to modify Step 2 and 3.
+All other Steps remains unchanged.
+
+
+### English to Romanian
+
+For Romanian, we use WMT16 corpora in our paper.
+
+The Step 2 changes to
+```
+bash chimera/prepare_data/download-wmt.sh --wmt16 --data-dir $WMT_ROOT --target ro
+```
+
+Step 3 remains unchanged.
+
+
+### English to {Italiano, Portuguese, Dutch}
+
+These language pairs uses OPUS100 as external MT corpora.
+
+The Step 2 changes to
+```
+bash chimera/prepare_data/download-opus100.sh --data-dir $WMT_ROOT
+```
+
+Step 3 changes to
+```
+bash chimera/prepare_data/prepare-opus100-en2any.sh \
+    --data-dir $WMT_ROOT --original-dev \
+    --external mustc --target $target --subword spm
+python3 chimera/prepare_data/prep_mustc_data.py \
+    --data-root $MUSTC_ROOT --task wave \
+    --ignore_fbank80 --joint_spm wmt14-en-$target-spm \
+    --languages $target --vocab-type unigram --vocab-size 10000
+```
+Actually, only the first command of Step 3 changes.
 
 
 ## Evaluating a Checkpoint
