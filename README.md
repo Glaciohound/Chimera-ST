@@ -1,4 +1,4 @@
-# Chimera: Learning Shared Semantic Space for Speech-to-Text Translation (Nightly Version)
+# Chimera: Learning Shared Semantic Space for Speech-to-Text Translation
 
 <div align="center">
   <img src="chimera/resources/figs/logo.png" width="50%">
