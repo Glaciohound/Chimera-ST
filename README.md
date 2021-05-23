@@ -3,6 +3,7 @@
 <div align="center">
   <img src="chimera/resources/figs/logo.png" width="50%">
 </div>
+<br />
 
 This is a Pytorch implementation for the "Chimera" paper
 " Learning Shared Semantic Space for Speech-to-Text Translation "
@@ -10,6 +11,11 @@ https://arxiv.org/abs/2105.03095
 (accepted by ACL Findings 2021),
 which aims to bridge the modality gap by unifying the task of MT (textual Machine Translation) and ST (Speech-to-Text Translation).
 It has achieved new SOTA performance on all 8 language pairs in MuST-C benchmark, by utilizing an external MT corpus.
+
+<div align="center">
+  <img src="chimera/resources/figs/method.png" width="100%">
+</div>
+<br />
 
 This repository is up to now a nightly version,
 and is bug-prone because of code refactoring.
@@ -27,6 +33,7 @@ if you want to follow the new FairSeq codes.
 **CONTRIBUTION:** You are also more than welcomed to test our code on your machines,
 and report feedbacks on results, bugs and performance!
 
+<br /> <br />
 
 # Results
 
@@ -36,15 +43,39 @@ Our model (Chimera) achieves new state-of-the-art results on all 8 language pair
 | --------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
 | BLEU      | 26.3  | 35.6  | 17.4  | 30.6  | 25.0  | 24.0  | 30.2  | 29.2  |
 
-Shown below is a visualization of the "Memories" learned by Chimera.
+Chimera novelly learns M distinct "memories" to store specific types of semantic information
+from both audio and text inputs.
+Shown below is a visualization of the "Memories" learned by Chimera-16,
+which is a variant with M = 16.
 Each learned cluster represents a individual type of information,
 while each marker is a sentence sample.
 "+" and "." means text and audio samples, respectively.
 
+
+<div align="center">
+  <img src="chimera/resources/figs/memory-visualization.gif" width="70%">
+</div>
+
+<!--
 Click the image to view the dynamic video on YouTube.
-
 [![Memory Visualization](https://img.youtube.com/vi/qwIB-Kd514s/0.jpg)](https://www.youtube.com/watch?v=qwIB-Kd514s)
+-->
 
+We can see more clearly from below (left) that memories learn a well-clustered semantic space,
+forming a "semantic" alignment (rather than spatial) between audio and text inputs,
+while ignoring the modality differences.
+
+On the right, we zoom in to focus one cluster in specific,
+and it can be easily observed that the vectors are well structured as well,
+with inputs with (probably one of) similar semantic features close in space to each other.
+
+<p float="left">
+  <img src="chimera/resources/figs/16memories.jpg" width="40%">
+  <img src="chimera/resources/figs/semantics.jpg" width="59%">
+</p>
+
+
+<br /> <br />
 
 # Trained Checkpoints
 
@@ -62,6 +93,8 @@ Our trained checkpoints are available at:
 | English-to-Dutch      | Chimera_EN2NL.pt | http://sf3-ttcdn-tos.pstatp.com/obj/nlp-opensource/acl2021/chimera/Chimera_EN2NL.pt |
 
 
+<br /> <br />
+
 # Interactive Translation
 
 You can download any one checkpoint mentioned above to local,
@@ -69,7 +102,7 @@ and translate local audios (only .wav files supported) to another language!
 To do this, you only need to run the model in an interactive mode.
 For example, you want to translate from English to Deutsh (DE)
 with an already trained checkpoint at $CHECKPOINT:
-```
+``` bash
 bash run.sh --script chimera/scripts/interactive-en2any-ST.sh \
     --target de --checkpoint $CHECKPOINT
 ```
@@ -106,6 +139,7 @@ To translate to other languages, remember to replace `de` with their language co
 | Portuguese            | PT / pt |
 | Dutch (Netherlands)   | NL / nl |
 
+<br /> <br />
 
 # Training a Model on MuST-C
 
@@ -124,7 +158,7 @@ For configuration, please set the global variables of
 `$WMT_ROOT`, `$MUSTC_ROOT` and `SAVE_ROOT`
 These will be where to put the datasets and checkpoints.
 For example:
-```
+``` bash
 export MUSTC_ROOT="speech_data/mustc"
 export WMT_ROOT="wmt_data"
 export SAVE_ROOT="checkpoints"
@@ -141,7 +175,7 @@ you can replace `tar xzvf` with: ` pigz -dc $TARFILE | tar xvf - `
 
 
 2. Download the WMT to `$WMT_ROOT/orig` via:
-```
+``` bash
 bash chimera/prepare_data/download-wmt.sh --wmt14 --data-dir $WMT_ROOT --target $target
 ```
 This may sometimes be too slow as the connection to `statmt.org` is not steady in some places.
@@ -149,7 +183,7 @@ In this case you can turn to other faster download sources if possible.
 
 
 3. Append MuST-C text data to $WMT_ROOT, and prepare the datasets and produce a joint spm dictionary:
-```
+``` bash
 bash chimera/prepare_data/prepare-wmt-en2any.sh \
     --data-dir $WMT_ROOT --wmt14 --original-dev \
     --external mustc --target $target --subword spm
@@ -174,7 +208,7 @@ To reproduce the results in the last row in Figure 1 in paper,
 you can directly use the training scripts available as follows.
 
 4. Pre-training on MT data:
-```
+``` bash
 bash run.sh --script chimera/scripts/train-en2any-MT.sh \
     --target $target --dataset wmt14 --max_updates 500000
 ```
@@ -187,7 +221,7 @@ Value for `--num-gpus` is recommended to be power of 2, and smaller than 8, e.g.
 
 5. Fine-tuning on MuST-C data:
 
-```
+``` bash
 bash run.sh --script chimera/scripts/train-en2any-ST.sh \
     --target $target --dataset wmt14 --max_updates 150000
 ```
@@ -216,7 +250,7 @@ and with a low beam width.
 
 Suppose the best ST checkpoint is at epoch `$BEST_EPOCH`,
 and we want to averaging 7 checkpoints around it.
-```
+``` bash
 python3 chimera/tools/eval-average-checkpoint.py \
     --ckpt-dir $ST_SAVE_ROOT --number-of-ckpts 7 \
     --center-of-ckpts $BEST_EPOCH
@@ -238,7 +272,7 @@ All other Steps remains unchanged.
 For Romanian, we use WMT16 corpora in our paper.
 
 The Step 2 changes to
-```
+``` bash
 bash chimera/prepare_data/download-wmt.sh --wmt16 --data-dir $WMT_ROOT --target ro
 ```
 
@@ -250,12 +284,12 @@ Step 3 remains unchanged.
 These language pairs uses OPUS100 as external MT corpora.
 
 The Step 2 changes to
-```
+``` bash
 bash chimera/prepare_data/download-opus100.sh --data-dir $WMT_ROOT
 ```
 
 Step 3 changes to
-```
+``` bash
 bash chimera/prepare_data/prepare-opus100-en2any.sh \
     --data-dir $WMT_ROOT --original-dev \
     --external mustc --target $target --subword spm
@@ -271,11 +305,26 @@ Actually, only the first command of Step 3 changes.
 
 You can also manually evaluate the performance of any one checkpoint on MuST-C test set.
 Suppose the path to your checkpoint is `$CHECKPOINT`
-```
+``` bash
 target=de bash chimera/generate/generate-mustc-final.sh $CHECKPOINT
 ```
+
+<br /> <br />
 
 # License
 
 Part of codes (especially codes outside `chimera/`) is adapted from FAIRSEQ code base,
 therefore carrying the MIT License of its original codes.
+See `NOTICE.md` for more details.
+
+# Citation
+
+Please cite as:
+``` bibtex
+@article{han2021learning,
+  title={Learning Shared Semantic Space for Speech-to-Text Translation},
+  author={Han, Chi and Wang, Mingxuan and Ji, Heng and Li, Lei},
+  journal={arXiv preprint arXiv:2105.03095},
+  year={2021}
+}
+```
