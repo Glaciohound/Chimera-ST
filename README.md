@@ -6,7 +6,7 @@
 <br />
 
 This is a Pytorch implementation for the "Chimera" paper
-" Learning Shared Semantic Space for Speech-to-Text Translation "
+*Learning Shared Semantic Space for Speech-to-Text Translation*
 https://arxiv.org/abs/2105.03095
 (accepted by ACL Findings 2021),
 which aims to bridge the modality gap by unifying the task of MT (textual Machine Translation) and ST (Speech-to-Text Translation).
@@ -73,6 +73,16 @@ with inputs with (probably one of) similar semantic features close in space to e
   <img src="chimera/resources/figs/16memories.jpg" width="40%">
   <img src="chimera/resources/figs/semantics.jpg" width="59%">
 </p>
+
+We can even focus on one instance of translation, and see how the memories works.
+Shown below visualizes the alignment between audio attention and text attention,
+which tightly gather around the diagonal line.
+Different colors represents different memories,
+which attend to different semantic segments of sentence / audio as shown in the figure.
+
+<div align="center">
+  <img src="chimera/resources/figs/attention_map_dark.png" width="100%">
+</div>
 
 
 <br /> <br />
