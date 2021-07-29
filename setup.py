@@ -173,7 +173,7 @@ def do_setup(package_data):
             "cython",
             "dataclasses",
             "editdistance",
-            "hydra-core",
+            "hydra-core<=1.0.6",
             "numpy",
             "regex",
             "sacrebleu>=1.4.12",
