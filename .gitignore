@@ -3,3 +3,6 @@ mt_data/
 speech_data/
 checkpoints
 chimera/tools/auto-generate-suicide.code
+
+**/.DS_Store
+.DS_Store

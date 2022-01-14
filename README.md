@@ -41,7 +41,7 @@ Our model (Chimera) achieves new state-of-the-art results on all 8 language pair
 
 | Direction | EN-DE | EN-FR | EN-RU | EN-ES | EN-IT | EN-RO | EN-PT | EN-NL |
 | --------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| BLEU      | 26.3  | 35.6  | 17.4  | 30.6  | 25.0  | 24.0  | 30.2  | 29.2  |
+| BLEU      | 27.1  | 35.6  | 17.4  | 30.6  | 25.0  | 24.0  | 30.2  | 29.2  |
 
 Chimera novelly learns M distinct "memories" to store specific types of semantic information
 from both audio and text inputs.
